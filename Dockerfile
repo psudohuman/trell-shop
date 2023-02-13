@@ -1,16 +1,17 @@
-FROM node
-COPY . /app
+# Use an official Node.js runtime as a parent image
+FROM node:14-alpine
+
+# Set the working directory to /app
 WORKDIR /app
-CMD npm install 
-CMD sudo systemctl start mysql
-CMD CREATE DATABASE trell_shop_db
-CMD node index.js
 
+# Copy the rest of the application files to the working directory
+COPY . .
 
+# Install npm dependencies
+RUN npm install
 
-FROM mcr.microsoft.com/mssql/server:2017-latest
-ARG SA_PASSWORD="Password1!"
-ENV SA_PASSWORD=$SA_PASSWORD
-ENV ACCEPT_EULA="Y"
+# Expose port 3000 for the application to listen on
+EXPOSE 3000
 
-EXPOSE 1433
+# Start the application
+CMD ["node", "index.js"]
