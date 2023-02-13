@@ -5,14 +5,16 @@ const api = express()
 const PORT = 4000
 const getInstallBannersResponse = require('./getInstallBanners')
 const { createPool } = require('mysql')
+const cors = require('cors');
 
+require('dotenv').config()
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
 const pool = createPool({
-  host:"localhost",
-  user:"admin",
-  password:"root",
-  database:"trell_shop_db"
+  host:process.env.DB_HOST,
+  user:process.env.DB_USERNAME,
+  password:process.env.DB_PASSWORD,
+  database:process.env.DB_NAME
 })
 
 const configMap = {}; 
@@ -50,6 +52,10 @@ const schema = buildSchema(`
 type Query {
   clientConfig: ClientConfig
   banners: [BannerItem]
+  trendingItems: [TrendingItem]
+    cmsPage (
+        id: Int,identifier: String
+    ): CmsPage
 }
 type ClientConfig {
     global: GlobalClientConfig
@@ -126,6 +132,69 @@ type RazorpayClientConfig {
     merchant_name : String
 }
 
+type CmsPage {
+  identifier: String 
+  url_key: String 
+  title: String 
+  content: String 
+  content_heading: String 
+  page_layout: String 
+  meta_title: String 
+  meta_description: String 
+  meta_keywords: String 
+  breadcrumb: cmsBreadcrumb 
+  videoIds:[String!]
+  trails : [TrailItems] 
+  trends : [TrendItems] 
+}
+type TrendItems {
+  tag: String
+  data: [TrendData]
+}
+type TrendData {
+  content: [ContentData]
+  categoryId: String
+  categoryName: String
+}
+type ContentData {
+  type: String,
+  url: String,
+  durationMs: String,
+  coverImage: String,
+  title: String,
+  id: String,
+  userId: String,
+  userName: String,
+  userAvatar: String,
+  userFollowers: String
+}
+type cmsBreadcrumb {
+  page_name: String 
+  page_url_key: String 
+  page_url_path: String
+}
+type TrailItems {
+  tag: String
+  data: [Trail]
+}
+type Trail {
+  trailId: String
+  videoUrl: String
+  durationMs: String
+  coverImage: String
+  title: String
+  username: String
+  userAvatar: String
+  followerCount: String
+  createdAt: String
+  updatedAt: String
+}
+type TrendingItem {
+  name: String
+  image_link: String
+  priority: Int
+  url: String
+}
 
 type BannerItem {
   image_link: String
@@ -193,7 +262,224 @@ const root = {
 
   banners: () => { 
     return installBannerImageLinks
-   }
+   },
+
+   trendingItems: () => {
+    return [
+        {
+            "image_link": "https://shop.trell.co/media/Zoom_Star_Logo.png",
+            "name": "Zoom Star",
+            "priority": 1,
+            "url": "/brands/zoom-star/c/78837",
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": "https://shop.trell.co/media/Mr._Wonkers_Logo.png",
+            "name": "Mr. Wonker",
+            "priority": 2,
+            "url": "/brands/mr-wonker/c/79314",
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": "https://shop.trell.co/media/Bewakoof_1.png",
+            "name": "Bewakoof",
+            "priority": 3,
+            "url": "/brands/bewakoof/c/3336",
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": null,
+            "name": "",
+            "priority": 4,
+            "url": null,
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": null,
+            "name": "",
+            "priority": 5,
+            "url": null,
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": "https://shop.trell.co/media/Gosriki.png",
+            "name": "Gosriki",
+            "priority": 6,
+            "url": "/brands/gosriki/c/5891",
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": "https://shop.trell.co/media/Pepe_Jeans_2.png",
+            "name": "Pepe Jeans London",
+            "priority": 7,
+            "url": "/brands/pepe-jeans-london/c/5523",
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": "https://shop.trell.co/media/Jack_Jones.png",
+            "name": "JACK & JONES",
+            "priority": 8,
+            "url": "/brands/jack-jones/c/4954",
+            "__typename": "TrendingItem"
+        },
+        {
+            "image_link": "https://shop.trell.co/media/Screenshot_2022-08-08_at_4.20.20_PM.png",
+            "name": "T Shirts",
+            "priority": 9,
+            "url": "/global/tshirt/c/80145",
+            "__typename": "TrendingItem"
+        }
+    ];
+},
+cmsPage: (id, identifier) => {
+    return {
+        "meta_description": "Shopping like never before! Get the Branded collection of Clothing, Accessories, Makeup, Health care, and lifestyle products for men and women. Free Shipping, Cash on delivery available on eligible purchase.",
+        "meta_title": "Online Shopping Site - Shop Men & Women Fashion & Lifestyle Products Online in India - TrellShop",
+        "videoIds": [
+            "9784832",
+            "9860271",
+            "9835548"
+        ],
+        "trends": [
+            {
+                "tag": "valentines_trend1",
+                "data": [
+                    {
+                        "categoryId": "951",
+                        "categoryName": "Lipsticks for Valentine's",
+                        "content": [
+                            {
+                                "coverImage": "https://cdn.trell.co/w=320,h=320/user-images/fetch/https://cdn.trell.co/w=320,h=320,fit=scale-down/user-images/images/orig/r1pkkTQmZh7UkHNhbdmapXHh1ECawWfQ.jpg",
+                                "title": "Title1",
+                                "id": "9784832",
+                                "url": "https://cdn2.trell.co/videos/orig/414d7dfecb707697a89efb115cd45f55.mp4",
+                                "userAvatar": "https://cdn.trell.co/w=60,h=60/user-images/fetch/https://cdn-gcp.trell.co/avatar/acdc711cbe3b4cb09374099ab2b4ff99.jpg",
+                                "userFollowers": "646372",
+                                "userName": "Aradhana_Acharya",
+                                "type": "video",
+                                "durationMs": "110000",
+                                "__typename": "ContentData"
+                            },
+                            {
+                                "coverImage": null,
+                                "title": null,
+                                "id": null,
+                                "url": "https://picsum.photos/640/640",
+                                "userAvatar": null,
+                                "userFollowers": null,
+                                "userName": null,
+                                "type": "image",
+                                "durationMs": null,
+                                "__typename": "ContentData"
+                            },
+                            {
+                                "coverImage": null,
+                                "title": null,
+                                "id": null,
+                                "url": "https://picsum.photos/640/640",
+                                "userAvatar": null,
+                                "userFollowers": null,
+                                "userName": null,
+                                "type": "image",
+                                "durationMs": null,
+                                "__typename": "ContentData"
+                            }
+                        ],
+                        "__typename": "TrendData"
+                    },
+                    {
+                        "categoryId": "3384",
+                        "categoryName": "Ace The Natural Makeup Look",
+                        "content": [
+                            {
+                                "coverImage": "https://cdn.trell.co/w=320,h=320/user-images/fetch/https://cdn.trell.co/w=320,h=320,fit=scale-down/user-images/images/orig/f8RoUBTYm1Idrpb5GFDxdory7TxRhdei.",
+                                "title": "Title2",
+                                "id": "9860271",
+                                "url": "https://cdn2.trell.co/videos/orig/80401b96362db84cec5e3656581cd737.mp4",
+                                "userAvatar": "https://cdn.trell.co/w=60,h=60/user-images/fetch/https://cdn.trell.co/w=60,h=60,fit=smart/user-images/avatar/f3L6CvWMyK0wuk4qNBiEhnas4DW5cUgT.jpg",
+                                "userFollowers": "47178",
+                                "userName": "drunkencaptain_",
+                                "type": "video",
+                                "durationMs": "68000",
+                                "__typename": "ContentData"
+                            },
+                            {
+                                "coverImage": null,
+                                "title": null,
+                                "id": null,
+                                "url": "https://picsum.photos/640/640",
+                                "userAvatar": null,
+                                "userFollowers": null,
+                                "userName": null,
+                                "type": "image",
+                                "durationMs": null,
+                                "__typename": "ContentData"
+                            },
+                            {
+                                "coverImage": null,
+                                "title": null,
+                                "id": null,
+                                "url": "https://picsum.photos/640/640",
+                                "userAvatar": null,
+                                "userFollowers": null,
+                                "userName": null,
+                                "type": "image",
+                                "durationMs": null,
+                                "__typename": "ContentData"
+                            }
+                        ],
+                        "__typename": "TrendData"
+                    },
+                    {
+                        "categoryId": "3336",
+                        "categoryName": "Lipsticks & Glosses for every occasion",
+                        "content": [
+                            {
+                                "coverImage": "https://cdn.trell.co/w=320,h=320/user-images/fetch/https://cdn.trell.co/w=320,h=320,fit=scale-down/user-images/images/orig/JmhCnM42uqqJi3iGv4J7eK7hw1npW8Sx.jpeg",
+                                "title": "Title3",
+                                "id": "9835548",
+                                "url": "https://cdn2.trell.co/videos/orig/7DFG0gHcOBnqkge2haapAsbFIdWLsEBl.mp4",
+                                "userAvatar": "https://cdn.trell.co/w=60,h=60/user-images/fetch/https://cdn-gcp.trell.co/avatar/37c0239c96394768adeb3330efd138ad.jpg",
+                                "userFollowers": "776434",
+                                "userName": "Bhawnalunthi",
+                                "type": "video",
+                                "durationMs": "63000",
+                                "__typename": "ContentData"
+                            },
+                            {
+                                "coverImage": null,
+                                "title": null,
+                                "id": null,
+                                "url": "https://picsum.photos/640/640",
+                                "userAvatar": null,
+                                "userFollowers": null,
+                                "userName": null,
+                                "type": "image",
+                                "durationMs": null,
+                                "__typename": "ContentData"
+                            },
+                            {
+                                "coverImage": null,
+                                "title": null,
+                                "id": null,
+                                "url": "https://picsum.photos/640/640",
+                                "userAvatar": null,
+                                "userFollowers": null,
+                                "userName": null,
+                                "type": "image",
+                                "durationMs": null,
+                                "__typename": "ContentData"
+                            }
+                        ],
+                        "__typename": "TrendData"
+                    }
+                ],
+                "__typename": "TrendItems"
+            }
+        ],
+        "__typename": "CmsPage"
+    }
+}
 };
 
 function getFreeDeliveryNudgeValue()
@@ -221,6 +507,8 @@ function getSearchProductSuggestionCount()
   return Number(configMap['trell_client_config/trell_client_global_config/search_product_suggestions']);
 }
 
+
+api.use(cors({credentials: true, origin: true}));
 // Set up the /graphql endpoint with express-graphql
 api.use('/graphql', graphqlHTTP({
   schema,
